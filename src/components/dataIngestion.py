@@ -25,8 +25,8 @@ class DataIngestion:
             test_data = pd.read_csv(test_path)
             logging.info('Making the root directory')
             os.makedirs(os.path.dirname(self.dataingestionconfig.train_path),exist_ok=True)
-            train_data.to_csv(self.dataingestionconfig.train_path)
-            test_data.to_csv(self.dataingestionconfig.test_path)
+            train_data.to_csv(self.dataingestionconfig.train_path,index=False,header=True)
+            test_data.to_csv(self.dataingestionconfig.test_path,index=False,header=True)
             logging.info('Train and Test Data is saved on the artifacts folder.')
             return self.dataingestionconfig.train_path,self.dataingestionconfig.test_path
         
