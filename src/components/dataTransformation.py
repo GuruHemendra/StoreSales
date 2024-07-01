@@ -42,9 +42,7 @@ def handle_item_fat_Content(item_fat_content: list[str] ) -> list[int]:
     except Exception as e:
         raise CustomException(e,sys)
 
-@dataclass
-class DataTransformationConfig:
-    preprocessor_path = os.path.join('artifacts','preprocessor.pkl')
+
 
 
 class MiniProcessor(BaseEstimator,TransformerMixin):
@@ -62,7 +60,6 @@ class MiniProcessor(BaseEstimator,TransformerMixin):
             X['Item_Identifier_3'] = col_3
             X['Item_new_Fat_Content'] =  fat_content
             X.drop(['Item_Identifier','Item_Fat_Content'],axis=1)
-            logging.info('Completed mini preprocessor.')
             return X
         except Exception as e:
             CustomException(e,sys)
@@ -82,7 +79,10 @@ class MiniProcessor(BaseEstimator,TransformerMixin):
         except Exception as e:
             CustomException(e,sys)
     
-    
+
+@dataclass
+class DataTransformationConfig:
+    preprocessor_path = os.path.join('artifacts','preprocessor.pkl')   
 
 
 class DataTransformation:
@@ -97,12 +97,14 @@ class DataTransformation:
             test_data = pd.read_csv(test_data_path)
             input_train = train_data.drop(['Item_Outlet_Sales'],axis=1)
             train_target = train_data['Item_Outlet_Sales']
-            input_test = test_data
+            input_test = test_data.drop(['Item_Outlet_Sales'],axis=1)
+            test_target = test_data['Item_Outlet_Sales']
             logging.info('Performing the transformation on the data')
             preprocessor = self.getDataTransformer()
             transfromed_train = preprocessor.fit_transform(input_train)
             transformed_train = np.c_[transfromed_train,train_target]
             transformed_test = preprocessor.transform(input_test)
+            transformed_test = np.c_[transformed_test,test_target]
             save_object(file_path= self.DataTransformerConfig.preprocessor_path,object=preprocessor)
             return (transformed_train,transformed_test,self.DataTransformerConfig.preprocessor_path) 
         except Exception as e:

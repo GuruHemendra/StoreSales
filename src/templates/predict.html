@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Sales Prediction Form</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Adjust alignment */
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0; /* Reset default body margin */
+            font-family: Arial, sans-serif; /* Added for better readability */
+        }
+
+        .container {
+            width: 60%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Enable vertical scrolling if content overflows */
+            max-height: 90vh; /* Limit height to allow space for viewport */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: calc(100% - 16px); /* Adjust for padding and border */
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: transparent;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: calc(100% - 10px);
+            background-position-y: 50%;
+            padding-right: 30px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .toggle-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-buttons button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .toggle-buttons button.active {
+            background-color: #0056b3;
+        }
+
+        .form-container,
+        .csv-upload {
+            display: none; /* Hide both containers by default */
+        }
+
+        .form-container.active,
+        .csv-upload.active {
+            display: block; /* Show active container */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Item Sales Prediction Form</h2>
+        
+        <div class="toggle-buttons">
+            <button id="form-toggle" class="active" onclick="toggleForm('form')">Fill Form</button>
+            <button id="csv-toggle" onclick="toggleForm('csv')">Upload CSV</button>
+        </div>
+
+        <div id="form-container" class="form-container active">
+            <form id="sales-form" action="{{ url_for('predict') }}" method="POST">
+                <label for="item_identifier">Item Identifier:</label><br>
+                <input type="text" id="item_identifier" name="item_identifier" pattern="^(DR|FD|NC)[a-zA-Z][0-9]{2}$" required>
+                <small>Example: DRX01, FDB10, NCA00</small><br><br>
+        
+                <label for="item_weight">Item Weight:</label><br>
+                <input type="number" id="item_weight" name="item_weight" step="any" required><br><br>
+        
+                <label for="item_fat_content">Item Fat Content:</label><br>
+                <select id="item_fat_content" name="item_fat_content" required>
+                    <option value="Low Fat">Low Fat</option>
+                    <option value="Regular">Regular</option>
+                </select><br><br>
+        
+                <label for="item_visibility">Item Visibility:</label><br>
+                <input type="number" id="item_visibility" name="item_visibility" step="any" required><br><br>
+        
+                <label for="item_type">Item Type:</label><br>
+                <select id="item_type" name="item_type" required>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Soft Drinks">Soft Drinks</option>
+                    <option value="Meat">Meat</option>
+                    <option value="Fruits and Vegetables">Fruits and Vegetables</option>
+                    <option value="Household">Household</option>
+                    <option value="Baking Goods">Baking Goods</option>
+                    <option value="Snack Foods">Snack Foods</option>
+                    <option value="Frozen Foods">Frozen Foods</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Health and Hygiene">Health and Hygiene</option>
+                    <option value="Hard Drinks">Hard Drinks</option>
+                    <option value="Canned">Canned</option>
+                    <option value="Breads">Breads</option>
+                    <option value="Starchy Foods">Starchy Foods</option>
+                    <option value="Others">Others</option>
+                    <option value="Seafood">Seafood</option>
+                </select><br><br>
+        
+                <label for="item_mrp">Item MRP:</label><br>
+                <input type="number" id="item_mrp" name="item_mrp" step="any" required><br><br>
+        
+                <label for="outlet_identifier">Outlet Identifier:</label><br>
+                <select id="outlet_identifier" name="outlet_identifier" required>
+                    <option value="OUT049">OUT049</option>
+                    <option value="OUT018">OUT018</option>
+                    <option value="OUT010">OUT010</option>
+                    <option value="OUT013">OUT013</option>
+                    <option value="OUT027">OUT027</option>
+                    <option value="OUT045">OUT045</option>
+                    <option value="OUT017">OUT017</option>
+                    <option value="OUT046">OUT046</option>
+                    <option value="OUT035">OUT035</option>
+                    <option value="OUT019">OUT019</option>
+                </select><br><br>
+        
+                <label for="outlet_establishment_year">Outlet Establishment Year:</label><br>
+                <select id="outlet_establishment_year" name="outlet_establishment_year" required>
+                    <option value=1999>1999</option>
+                    <option value=2009>2009</option>
+                    <option value=1998>1998</option>
+                    <option value=1987>1987</option>
+                    <option value=1985>1985</option>
+                    <option value=2002>2002</option>
+                    <option value=2007>2007</option>
+                    <option value=1997>1997</option>
+                    <option value=2004>2004</option>
+                </select><br><br>
+        
+                <label for="outlet_size">Outlet Size:</label><br>
+                <select id="outlet_size" name="outlet_size" required>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Small">Small</option>
+                </select><br><br>
+        
+                <label for="outlet_location_type">Outlet Location Type:</label><br>
+                <select id="outlet_location_type" name="outlet_location_type" required>
+                    <option value="Tier 1">Tier 1</option>
+                    <option value="Tier 3">Tier 3</option>
+                    <option value="Tier 2">Tier 2</option>
+                </select><br><br>
+        
+                <label for="outlet_type">Outlet Type:</label><br>
+                <select id="outlet_type" name="outlet_type" required>
+                    <option value="Supermarket Type1">Supermarket Type1</option>
+                    <option value="Supermarket Type2">Supermarket Type2</option>
+                    <option value="Grocery Store">Grocery Store</option>
+                    <option value="Supermarket Type3">Supermarket Type3</option>
+                </select><br><br>
+        
+                <input type="submit" value="Predict">
+            </form>
+        </div>
+
+        <div id="csv-upload" class="csv-upload">
+            <form id="csv-form" action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+                <label for="csv_file">Upload CSV file:</label><br>
+                <input type="file" id="csv_file" name="csv_file" accept=".csv"><br><br>
+                <input type="submit" value="Upload CSV">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleForm(type) {
+            const formContainer = document.getElementById('form-container');
+            const csvUpload = document.getElementById('csv-upload');
+            const formToggle = document.getElementById('form-toggle');
+            const csvToggle = document.getElementById('csv-toggle');
+
+            if (type === 'form') {
+                formContainer.classList.add('active');
+                csvUpload.classList.remove('active');
+                formToggle.classList.add('active');
+                csvToggle.classList.remove('active');
+            } else if (type === 'csv') {
+                formContainer.classList.remove('active');
+                csvUpload.classList.add('active');
+                formToggle.classList.remove('active');
+                csvToggle.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

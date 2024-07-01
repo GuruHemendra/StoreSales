@@ -5,4 +5,5 @@ seaborn
 flask
 dill
 matplotlib
+xgboost
 # -e .
